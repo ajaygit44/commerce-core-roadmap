@@ -41,7 +41,7 @@
     <table id="jira-table">
       <thead>
         <tr>
-          <!--<th>Issue</th>-->
+          <th>Jira ID</th>
           <th>Feature</th>
           <th>Status</th>
           <th>Sponsor</th>
@@ -108,15 +108,16 @@ async function loadDashboard(){
 
     tbody.innerHTML += `
       <tr class="${rowClass}">
+        <td>${issue.key}</td>
         <td>${issue.fields.summary || '-'}</td>
         <td>${status || '-'}</td>
+        <td>${targetDate || '-'}</td>
+        <td>${goLiveDate || '-'}</td>
         <td>${issue.fields.customfield_10545?.[0]?.value || '-'}</td>
         <td>${issue.fields.customfield_10464 || '-'}</td>
         <td>${issue.fields.customfield_13582?.value || '-'}</td>
         <td>${issue.fields.customfield_10261?.displayName || '-'}</td>
         <td>${issue.fields.customfield_10055?.displayName || '-'}</td>
-        <td>${targetDate || '-'}</td>
-        <td>${goLiveDate || '-'}</td>
       </tr>`;
   });
 
