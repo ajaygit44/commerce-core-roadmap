@@ -2,11 +2,18 @@ import express from 'express';
 import fetch from 'node-fetch';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 dotenv.config();
 
 const app = express();
 app.use(cors());
+
+// Path setup for static files
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+app.use(express.static(path.join(__dirname)));
 
 const JQL = `project = "CORE PLANs" and status NOT IN (ToDo, Rejected, Duplicate, Closed, "On Hold", Backlog, "In review") and ("Business Priority[Select List (cascading)]" IN (P0) OR "Quarter[Dropdown]" IN ("Q3 2025 [Jul, Aug, Sept]","Q4 2025 [Oct, Nov, Dec]")) and "Quarter[Dropdown]" != TBD ORDER BY cf[10470] ASC, cf[11536] ASC, cf[14375] ASC, cf[13615] ASC, status ASC`;
 
@@ -69,6 +76,11 @@ app.get('/dashboard', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error', details: error.toString() });
   }
 });
+
+// Explicitly serve index.html on the root
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+  });
 
 app.listen(process.env.PORT || 3000, () => {
   console.log(`Jira Dashboard API running on port ${process.env.PORT || 3000}`);
