@@ -128,7 +128,9 @@ async function loadDashboard(){
   document.getElementById('total-count').textContent = data.issues.length;
   document.getElementById('dev-count').textContent = devCount;
 
+  setTimeout(() => {
   startScrolling();
+}, 5000); // 5000 milliseconds = 5 seconds, adjust as per your need
 }
 
 function startScrolling() {
