@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Commerce - Core Roadmap Q42025 [Oct - Dec 2025]</title>
+  <style>
+    body { margin:0; padding:0; overflow:hidden; font-family: Arial, sans-serif; }
+    h2 { text-align: center; margin: 10px 0; }
+    table { width:100%; border-collapse: collapse; font-size: 14px; }
+    th, td { padding:8px; text-align:left; border-bottom:1px solid #ddd; }
+    th { background-color:#607D8B; color: white; position: sticky; top: 0; z-index: 1; }
+    .green { background-color: #C8E6C9; }
+    .red { background-color: #FFCDD2; }
+    .yellow { background-color: #FFF9C4; }
+    .legend { margin:10px; text-align:center; }
+    .legend span { 
+      display:inline-block; 
+      padding:5px 10px; 
+      margin-right:10px; 
+      border-radius:4px; 
+    }
+  </style>
+</head>
+<body>
+  <h2>Commerce - Core Roadmap Q42025 [Oct - Dec 2025]</h2>
+  <!-- Color Legend Starts Here -->
+<div style="margin:10px; text-align:center;">
+  <span style="display:inline-block; background-color:#ecf0f3; padding:5px 10px; border-radius:4px;">📌 Total Requirements: <b id="total-count">0</b></span>
+    <span style="display:inline-block; background-color:#C8E6C9; padding:5px 10px; margin-right:10px; border-radius:4px;">
+      ✅ Released: <b id="released-count">0</b>
+    </span>
+    <span style="display:inline-block; background-color:#FFCDD2; padding:5px 10px; margin-right:10px; border-radius:4px;">
+      🚩 Timeline Breached (Go-Live Date > Business Target Date): <b id="breached-count">0</b>
+    </span>
+    <span style="display:inline-block; background-color:#FFF9C4; padding:5px 10px; border-radius:4px;">
+      ⚠️ Timeline Near (Within 4 Days): <b id="near-count">0</b>
+    </span>
+    <span style="display:inline-block; background-color:#ebe8f0; padding:5px 10px; border-radius:4px;">🚧 In Development: <b id="dev-count">0</b></span>
+  </div>
+  <!-- Color Legend Ends Here -->
+  <div id="container" style="height:90vh; overflow:auto;">
+    <table id="jira-table">
+      <thead>
+        <tr>
+          <!--<th>Issue</th>-->
+          <th>Feature</th>
+          <th>Status</th>
+          <th>Sponsor</th>
+          <th style="width:12%;">Merchant / Brand Name</th>
+          <th>Initiative Type</th>
+          <th>Product Manager</th>
+          <th>Engineering Lead</th>
+          <!--<th>Reporter</th>-->
+          <th>Business Target Date</th>
+          <th style="width:9%;">Go-Live Date</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+<script>
+const SCROLL_STEP = 1;
+const SCROLL_INTERVAL = 50;
+const DELAY_AT_BOTTOM = 10000;
+const API_URL = 'http://localhost:3000/dashboard';
+
+function dateDiffInDays(a, b) {
+  const _MS_PER_DAY = 1000 * 60 * 60 * 24;
+  return Math.ceil((a - b) / _MS_PER_DAY);
+}
+
+async function loadDashboard(){
+  const res = await fetch(API_URL);
+  const data = await res.json();
+  const tbody = document.querySelector('#jira-table tbody');
+  tbody.innerHTML = '';
+
+  // Initialize counters
+  let releasedCount = 0, breachedCount = 0, nearCount = 0, devCount = 0;
+
+  data.issues.forEach(issue => {
+    const status = issue.fields.status?.name;
+    const targetDate = issue.fields.customfield_10470;
+    const goLiveDate = issue.fields.customfield_11536;
+
+    let rowClass = '';
+
+    if (status === 'Released') {
+      rowClass = 'green';
+      releasedCount++;
+    } else if (['IN DEVELOPMENT', 'READY FOR PROD RELEASE', 'DEVELOPMENT DONE'].includes(status)) {
+      devCount++;
+    }
+
+    if (status !== 'Released' && targetDate && goLiveDate) {
+      const target = new Date(targetDate);
+      const goLive = new Date(goLiveDate);
+      const diffDays = dateDiffInDays(goLive, target);
+
+      if (diffDays > 0) {
+        rowClass = 'red';
+        breachedCount++;
+      } else if (diffDays >= -4 && diffDays <= 0) {
+        rowClass = 'yellow';
+        nearCount++;
+      }
+    }
+
+    tbody.innerHTML += `
+      <tr class="${rowClass}">
+        <td>${issue.fields.summary || '-'}</td>
+        <td>${status || '-'}</td>
+        <td>${issue.fields.customfield_10545?.[0]?.value || '-'}</td>
+        <td>${issue.fields.customfield_10464 || '-'}</td>
+        <td>${issue.fields.customfield_13582?.value || '-'}</td>
+        <td>${issue.fields.customfield_10261?.displayName || '-'}</td>
+        <td>${issue.fields.customfield_10055?.displayName || '-'}</td>
+        <td>${targetDate || '-'}</td>
+        <td>${goLiveDate || '-'}</td>
+      </tr>`;
+  });
+
+  // Dynamically update counts
+  document.getElementById('released-count').textContent = releasedCount;
+  document.getElementById('breached-count').textContent = breachedCount;
+  document.getElementById('near-count').textContent = nearCount;
+  document.getElementById('total-count').textContent = data.issues.length;
+  document.getElementById('dev-count').textContent = devCount;
+
+  startScrolling();
+}
+
+function startScrolling() {
+  const container = document.getElementById('container');
+  const timer = setInterval(() => {
+    container.scrollTop += SCROLL_STEP;
+    if ((container.scrollTop + container.clientHeight + 5) >= container.scrollHeight) {
+      clearInterval(timer);
+      setTimeout(() => {
+        container.scrollTop = 0;
+        loadDashboard(); // reload latest data periodically
+      }, DELAY_AT_BOTTOM);
+    }
+  }, SCROLL_INTERVAL);
+}
+
+loadDashboard();
+</script>
+</body>
+</html>
