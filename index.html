@@ -29,7 +29,7 @@
       ✅ Released: <b id="released-count">0</b>
     </span>
     <span style="display:inline-block; background-color:#FFCDD2; padding:5px 10px; margin-right:10px; border-radius:4px;">
-      🚩 Timeline Breached (Go-Live Date > Business Target Date): <b id="breached-count">0</b>
+      🚩 Promise Timeline Breached: <b id="breached-count">0</b>
     </span>
     <span style="display:inline-block; background-color:#FFF9C4; padding:5px 10px; border-radius:4px;">
       ⚠️ Timeline Near (Within 4 Days): <b id="near-count">0</b>
@@ -77,6 +77,7 @@ async function loadDashboard(){
 
   // Initialize counters
   let releasedCount = 0, breachedCount = 0, nearCount = 0, devCount = 0;
+  const today = new Date();
 
   data.issues.forEach(issue => {
     const status = issue.fields.status?.name;
@@ -92,15 +93,15 @@ async function loadDashboard(){
       devCount++;
     }
 
-    if (status !== 'Released' && targetDate && goLiveDate) {
+    
+    if (status !== 'Released' && targetDate) {
       const target = new Date(targetDate);
-      const goLive = new Date(goLiveDate);
-      const diffDays = dateDiffInDays(goLive, target);
+      const diffDays = dateDiffInDays(target, today);
 
-      if (diffDays > 0) {
+      if (diffDays < 0) {  // Date has already passed and status not released yet
         rowClass = 'red';
         breachedCount++;
-      } else if (diffDays >= -4 && diffDays <= 0) {
+      } else if (diffDays >= 0 && diffDays <= 4) { // Date is upcoming within 4 days
         rowClass = 'yellow';
         nearCount++;
       }
