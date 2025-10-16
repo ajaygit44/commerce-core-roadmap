@@ -94,14 +94,16 @@ async function loadDashboard(){
     }
 
     
-    if (status !== 'Released' && targetDate) {
-      const target = new Date(targetDate);
+    let compareDate = targetDate || goLiveDate;  // check Business target date first, else go-live date
+
+    if (status !== 'Released' && compareDate) {
+      const target = new Date(compareDate);
       const diffDays = dateDiffInDays(target, today);
 
-      if (diffDays < 0) {  // Date has already passed and status not released yet
+      if (diffDays < 0) {  // date has already passed, timeline breached
         rowClass = 'red';
         breachedCount++;
-      } else if (diffDays >= 0 && diffDays <= 4) { // Date is upcoming within 4 days
+      } else if (diffDays >= 0 && diffDays <= 4) { // date is near (within next 4 days)
         rowClass = 'yellow';
         nearCount++;
       }
