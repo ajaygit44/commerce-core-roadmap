@@ -63,7 +63,18 @@ const SCROLL_STEP = 1;
 const SCROLL_INTERVAL = 50;
 const DELAY_AT_BOTTOM = 10000;
 //const API_URL = 'http://localhost:3000/dashboard'; // for local
-const API_URL = 'https://commerce-core-roadmap.onrender.com/dashboard'; // for render server to deploy and see dashboard publicly 
+//const API_URL = 'https://commerce-core-roadmap.onrender.com/dashboard'; // for render server to deploy and see dashboard publicly 
+
+let API_URL = '';
+
+  if (window.location.hostname.includes('onrender.com')) {
+    API_URL = 'https://commerce-core-roadmap.onrender.com/dashboard'; // Render URL
+  } else if (window.location.hostname.includes('run.app')) {
+    API_URL = 'https://YOUR-GCP-CLOUD-RUN-URL/dashboard'; // GCP Cloud Run URL
+  } else {
+    API_URL = 'http://localhost:3000/dashboard'; // Local development
+  }
+
 function dateDiffInDays(a, b) {
   const _MS_PER_DAY = 1000 * 60 * 60 * 24;
   return Math.ceil((a - b) / _MS_PER_DAY);
