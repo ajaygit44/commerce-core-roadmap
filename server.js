@@ -15,7 +15,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 app.use(express.static(path.join(__dirname)));
 
-const JQL = `project = "CORE PLANs" and status NOT IN (ToDo, Rejected, Duplicate, Closed, "On Hold", Backlog, "In review") and ("Business Priority[Select List (cascading)]" IN (P0) OR "Quarter[Dropdown]" IN ("Q3 2025 [Jul, Aug, Sept]","Q4 2025 [Oct, Nov, Dec]","Q1 2026 [Jan, Feb, Mar]")) and "Quarter[Dropdown]" != TBD ORDER BY cf[10470] ASC, cf[11536] ASC, cf[14375] ASC, cf[13615] ASC, status ASC`;
+const JQL = `project = "CORE PLANs" and status NOT IN (Rejected, Duplicate, Closed, "On Hold") and ("Business Priority[Select List (cascading)]" IN (P0) OR "Quarter[Dropdown]" IN ("Q3 2025 [Jul, Aug, Sept]","Q4 2025 [Oct, Nov, Dec]","Q1 2026 [Jan, Feb, Mar]")) and "Quarter[Dropdown]" != TBD ORDER BY cf[10470] ASC, cf[11536] ASC, cf[14375] ASC, cf[13615] ASC, status ASC`;
 
 app.get('/dashboard', async (req, res) => {
   let allIssues = [];
