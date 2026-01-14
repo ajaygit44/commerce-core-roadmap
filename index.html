@@ -127,7 +127,7 @@ async function loadDashboard(){
         <td>${status || '-'}</td>
         <td>${targetDate || '-'}</td>
         <td>${goLiveDate || '-'}</td>
-        <td>${issue.fields.customfield_10545?.[0]?.value || '-'}</td>
+        <td>${issue.fields.customfield_10545?.map(item => item.value).join(', ') || '-'}</td>
         <td>${issue.fields.customfield_10464 || '-'}</td>
         <td>${issue.fields.customfield_13582?.value || '-'}</td>
         <td>${issue.fields.customfield_10261?.displayName || '-'}</td>
